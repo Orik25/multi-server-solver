@@ -13,6 +13,8 @@ public class UserRegistrationDTO {
 
     private String password;
 
+    private Boolean isVip;
+
     public UserRegistrationDTO() {
     }
 
@@ -46,5 +48,13 @@ public class UserRegistrationDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean getIsVip() {
+        return isVip;
+    }
+
+    public void setIsVip(Boolean vip) {
+        isVip = vip;
     }
 }
