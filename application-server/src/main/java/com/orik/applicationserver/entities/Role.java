@@ -1,6 +1,6 @@
 package com.orik.applicationserver.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class Role {
     private String name;
 
     @OneToMany(mappedBy = "role")
-    @JsonManagedReference(value = "userRole")
+    @JsonBackReference(value = "userRole")
     private List<User> users;
 
     public Role() {

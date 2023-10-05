@@ -1,4 +1,4 @@
-package com.orik.applicationserver.repository;
+package com.orik.applicationserver.DAO;
 
 
 import com.orik.applicationserver.entities.Request;
