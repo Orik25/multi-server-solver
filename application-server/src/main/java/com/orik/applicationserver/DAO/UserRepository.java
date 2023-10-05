@@ -1,4 +1,4 @@
-package com.orik.applicationserver.repository;
+package com.orik.applicationserver.DAO;
 
 import com.orik.applicationserver.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

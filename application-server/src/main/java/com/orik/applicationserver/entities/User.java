@@ -1,6 +1,5 @@
 package com.orik.applicationserver.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -28,7 +27,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    @JsonBackReference(value = "userRole")
+    @JsonManagedReference(value = "userRole")
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
