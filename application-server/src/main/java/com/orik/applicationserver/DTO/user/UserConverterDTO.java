@@ -33,7 +33,7 @@ public class UserConverterDTO {
         newUser.setEmail(user.getEmail());
         newUser.setFirstName(user.getFirstName());
         newUser.setLastName(user.getLastName());
-//        newUser.setPassword(passwordEncoder.encode(user.getPassword()));//todo: implement SecurityConfig
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setRole(getRoleByUserType(user));
         newUser.setRequests(new ArrayList<>());
 
