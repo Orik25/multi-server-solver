@@ -3,6 +3,7 @@ package com.orik.applicationserver.service.impl;
 import com.orik.applicationserver.DAO.UserRepository;
 import com.orik.applicationserver.DTO.user.UserRegistrationDTO;
 import com.orik.applicationserver.entities.User;
+import com.orik.applicationserver.exception.NoUserFoundException;
 import com.orik.applicationserver.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id) //todo: add custom exception
-                .orElseThrow(NullPointerException::new);
+        return userRepository.findById(id)
+                .orElseThrow(()-> new NoUserFoundException("User not found with id: " + id));
     }
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email) //todo: add custom exception
-                .orElseThrow(NullPointerException::new);
+        return userRepository.findByEmail(email)
+                .orElseThrow(()-> new NoUserFoundException("User not found with email: " + email));
     }
 
     @Override

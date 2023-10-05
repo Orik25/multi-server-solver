@@ -2,6 +2,7 @@ package com.orik.applicationserver.service.impl;
 
 import com.orik.applicationserver.DAO.RequestRepository;
 import com.orik.applicationserver.entities.Request;
+import com.orik.applicationserver.exception.NoRequestFoundException;
 import com.orik.applicationserver.service.interfaces.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public void deleteById(Long id) {
         Request request = requestRepository.findById(id)
-                .orElseThrow(NullPointerException::new);//todo: add custom exception
-        requestRepository.delete(request);
+                .orElseThrow(()-> new NoRequestFoundException("Impossible to update the Request. Request not found with id: " + id));
     }
 }
