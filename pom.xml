@@ -19,8 +19,8 @@
     </properties>
 
     <modules>
-        <module>client</module>
         <module>application-server</module>
+        <module>client-server</module>
         <module>load-balancer</module>
     </modules>
 

@@ -6,16 +6,23 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="application-server" />
-        <module name="client" />
         <module name="load-balancer" />
+        <module name="client-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="application-server (1)" target="17" />
+      <module name="application-server (2)" target="17" />
+      <module name="client" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="application-server" options="-parameters" />
+      <module name="application-server (1)" options="-parameters" />
+      <module name="application-server (2)" options="-parameters" />
       <module name="client" options="-parameters" />
+      <module name="client-server" options="-parameters" />
       <module name="load-balancer" options="-parameters" />
     </option>
   </component>
