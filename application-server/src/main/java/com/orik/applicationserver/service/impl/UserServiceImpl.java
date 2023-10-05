@@ -5,7 +5,9 @@ import com.orik.applicationserver.DTO.user.UserRegistrationDTO;
 import com.orik.applicationserver.entities.User;
 import com.orik.applicationserver.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
