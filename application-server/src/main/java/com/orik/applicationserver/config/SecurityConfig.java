@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").hasAnyRole(VIP, USER)
                 )
                 .formLogin((form) -> form
-//                        .loginPage("/login")
+                        .loginPage("/login")
                         .successHandler(successHandler())
                         .permitAll()
                 )

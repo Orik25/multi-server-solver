@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class LoginController {
 
 
-//    @GetMapping("/login")
-//    public String showLoginPage(@RequestParam(name = "successRegister",defaultValue = "false") boolean success,
-//                                Model model){
-//        model.addAttribute("success" ,success);
-//        return "login";
-//    }
     @GetMapping("/login")
-    public String showLoginForm(){
+    public String showLoginPage(@RequestParam(name = "successRegister",defaultValue = "false") boolean success,
+                                Model model){
+        model.addAttribute("success" ,success);
         return "login";
     }
+//    @GetMapping("/login")
+//    public String showLoginForm(){
+//        return "login";
+//    }
 }
