@@ -1,6 +1,7 @@
 package com.orik.applicationserver.service.impl;
 
 import com.orik.applicationserver.DAO.UserRepository;
+import com.orik.applicationserver.DTO.user.UserConverterDTO;
 import com.orik.applicationserver.DTO.user.UserRegistrationDTO;
 import com.orik.applicationserver.entities.User;
 import com.orik.applicationserver.exception.NoUserFoundException;
@@ -11,10 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserConverterDTO userConverter;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserConverterDTO userConverter) {
         this.userRepository = userRepository;
+        this.userConverter = userConverter;
     }
 
     @Override
@@ -31,8 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(UserRegistrationDTO user) {
-//        return userRepository.save(user);//todo: add converter
-        return null;
+        return userRepository.save(userConverter.convertToEntity(user));
     }
 
 }
