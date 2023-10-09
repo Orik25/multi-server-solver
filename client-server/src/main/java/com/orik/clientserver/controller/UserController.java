@@ -6,11 +6,15 @@ import com.orik.clientserver.entities.User;
 import com.orik.clientserver.service.interfaces.RequestService;
 import com.orik.clientserver.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @Controller
 @RequestMapping("/api")
@@ -20,12 +24,19 @@ public class UserController {
     private final RequestConverterDTO requestConverterDTO;
     private final UserService userService;
 
+    private final RestTemplate restTemplate;
+
+
 
     @Autowired
-    public UserController(RequestService requestService, RequestConverterDTO requestConverterDTO, UserService userService) {
+    public UserController(RequestService requestService,
+                          RequestConverterDTO requestConverterDTO,
+                          UserService userService,
+                          RestTemplate restTemplate) {
         this.requestService = requestService;
         this.requestConverterDTO = requestConverterDTO;
         this.userService = userService;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -43,7 +54,22 @@ public class UserController {
 
     @PostMapping("/find-number")
     public String findFibonacciNumber(@RequestParam("request") int index) {
-        requestService.addNew(requestConverterDTO.convertToEntity(index));
+        //визначаємо порт на який будемо кидати запит
+        Request request = requestService.addNew(requestConverterDTO.convertToEntity(index));
+        int port = 8082;
+        request.setPort(port);
+        String serverUrl = "http://localhost:"+port+"get-result";
+
+        // Створюємо HttpHeaders з налаштуваннями для JSON-запиту
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Створюємо HttpEntity з об'єктом request і HttpHeaders
+        HttpEntity<Request> requestEntity = new HttpEntity<>(request, headers);
+
+        // Відправляємо POST-запит з HttpEntity
+        restTemplate.postForObject(serverUrl, requestEntity, String.class);
+
         return "redirect:/api";
     }
 
