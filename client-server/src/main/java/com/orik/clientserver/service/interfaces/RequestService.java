@@ -5,7 +5,9 @@ import org.springframework.data.domain.Page;
 
 public interface RequestService {
 
-    Page<Request> getAllRequestsSorted(int page, int size, String sortField, String sortOrder);
+    Request addNew(Request request);
+
+    Page<Request> getAllRequestsSorted(int page, int size, String sortField, String sortOrder,Long userId);
 
     void deleteById(Long id);
 

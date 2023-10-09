@@ -1,6 +1,7 @@
 package com.orik.clientserver.service.impl;
 
 import com.orik.clientserver.DAO.RequestRepository;
+import com.orik.clientserver.constant.RequestStatus;
 import com.orik.clientserver.entities.Request;
 import com.orik.clientserver.exception.NoRequestFoundException;
 import com.orik.clientserver.service.interfaces.RequestService;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.time.ZonedDateTime;
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -21,7 +24,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Page<Request> getAllRequestsSorted(int page, int size, String sortField, String sortOrder) {
+    public Page<Request> getAllRequestsSorted(int page, int size, String sortField, String sortOrder,Long userId) {
         Sort sort = Sort.by(sortField);
 
         if ("desc".equals(sortOrder)) {
@@ -29,7 +32,12 @@ public class RequestServiceImpl implements RequestService {
         }
 
         PageRequest pageRequest = PageRequest.of(page, size, sort);
-        return requestRepository.findAll(pageRequest);
+        return requestRepository.findByUserId(userId,pageRequest);
+    }
+
+    @Override
+    public Request addNew(Request request) {
+       return requestRepository.save(request);
     }
 
     @Override
@@ -37,4 +45,5 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestRepository.findById(id)
                 .orElseThrow(()-> new NoRequestFoundException("Impossible to update the Request. Request not found with id: " + id));
     }
+
 }
