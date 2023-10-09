@@ -36,7 +36,16 @@
           <div th:fragment="history">
 
             <div class="col-md-12">
-
+              <div class="col-md-12">
+                <!-- Форма для надсилання запиту POST -->
+                <form th:action="@{/api/find-number}" method="post">
+                  <div class="mb-3">
+                    <label for="requestInput" class="form-label">Find the Fibonacci number</label>
+                    <input type="text" class="form-control" id="requestInput" name="request" placeholder="Enter index" th:value="${request}">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              </div>
 
               <table id="historyTable" class="table table-striped table-responsive-md">
                 <thead>
