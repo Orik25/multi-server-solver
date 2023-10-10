@@ -22,9 +22,9 @@ public class TestController {
         this.threadPool = threadPool;
     }
 
-    @GetMapping("/get-response/{body}")
-    public String getResponse(@PathVariable String body){
-        return "response from application-server("+body+")!";
+    @GetMapping("/get-from-app")
+    public String getResponse(){
+        return "response from application-server(8082)!";
     }
 
     @PostMapping("/get-result")
