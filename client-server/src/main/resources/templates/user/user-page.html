@@ -132,7 +132,7 @@
                         </a>
                       </td>
                       <td><a th:href="@{/api/delete-request/{id}(id=${request.id})}"
-                             th:if="${request.status.contains('done') || request.status.contains('canceled') }"
+                             th:if="${request.status == 'done' or request.status == 'canceled'}"
                              class="btn btn-warning"><i class="fas fa-user-times ml-2"
                                                         onclick="if(!(confirm('Are you sure?'))) return false"></i></a>
                       </td>

@@ -33,6 +33,14 @@ public class RequestConverterDTO {
         return request;
     }
 
+    public RequestDTO convertToDTO(Request request){
+        RequestDTO requestDTO = new RequestDTO();
+        requestDTO.setId(request.getId());
+        requestDTO.setStatus(request.getStatus());
+        requestDTO.setRequest(request.getRequest());
+        return requestDTO;
+    }
+
     private User getUserFromAuthentication(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.findByEmail(authentication.getName());
