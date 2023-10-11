@@ -51,7 +51,7 @@
                 <thead>
 
                 <tr>
-                  <th COLSPAN="5">
+                  <th COLSPAN="7">
                     <a class="text-dark" th:href="@{/api}" style="text-decoration: none;">Default
                       list</a>
                   </th>
@@ -95,6 +95,8 @@
                        th:href="@{/api(sortField='status', sortOrder='desc')}"
                        style="text-decoration: none;">▼</a>
                   </th>
+                  <th>Refresh</th>
+                  <th>Cancel</th>
                   <th>Delete</th>
                 </tr>
 
@@ -103,7 +105,7 @@
                 <tbody>
                 <div th:switch="${historyPage.content.size()}" class="container my-3">
                   <tr th:case="0">
-                    <th COLSPAN="5">
+                    <th COLSPAN="7">
                       <h2 CLASS=" d-flex align-items-center justify-content-center">No Requests
                         found</h2>
                     </th>
@@ -115,13 +117,28 @@
                       <td th:text="${request.request}"></td>
                       <td th:text="${request?.result}"></td>
                       <td th:text="${request.status}"></td>
+                      <td>
+                        <a th:href="@{/api/refresh-request/{id}(id=${request.id})}"
+                           class="btn btn-warning"
+                           th:if="${request.status.contains('in progress')}">
+                          <i class="fas fa-sync-alt ml-2"></i>
+                        </a>
+                      </td>
+                      <td>
+                        <a th:href="@{/api/cancel-request/{id}(id=${request.id})}"
+                           class="btn btn-warning"
+                           th:if="${request.status.contains('in progress')}">
+                          <i class="fas fa-solid fa-ban ml 2"></i>
+                        </a>
+                      </td>
                       <td><a th:href="@{/api/delete-request/{id}(id=${request.id})}"
+                             th:if="${request.status == 'done' or request.status == 'canceled'}"
                              class="btn btn-warning"><i class="fas fa-user-times ml-2"
                                                         onclick="if(!(confirm('Are you sure?'))) return false"></i></a>
                       </td>
                     </tr>
                     <tr>
-                      <td COLSPAN="5">
+                      <td COLSPAN="7">
                         <div th:if="${historyPage.totalPages > 1}"
                              class="d-flex justify-content-center my-3">
                           <ul class="pagination">
