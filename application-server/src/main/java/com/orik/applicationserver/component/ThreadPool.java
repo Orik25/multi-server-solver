@@ -2,22 +2,23 @@ package com.orik.applicationserver.component;
 
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class ThreadPool {
     private ExecutorService executorService;
     private LinkedBlockingQueue<Runnable> taskQueue;
+    private Map<Long, Integer> taskIndexMap = new ConcurrentHashMap<>();
+    private Set<Long> tasksInQueue = ConcurrentHashMap.newKeySet();
 
-    private Set<Long> executingTasks = ConcurrentHashMap.newKeySet();
+    private Map<Long,Long> timeStart = new HashMap<>();
 
 
-    private final int NUMBER_OF_THREADS = 1;
+    private final int NUMBER_OF_THREADS = 5;
 
     public ThreadPool() {
 
@@ -28,7 +29,8 @@ public class ThreadPool {
 
     public Future<Long> executeTask(int index,Long taskId) {
         FibonacciTask task = new FibonacciTask(index,taskId);
-        executingTasks.add(taskId);
+        tasksInQueue.add(taskId);
+        taskIndexMap.put(taskId,index);
 
         return executorService.submit(task);
     }
@@ -46,7 +48,7 @@ public class ThreadPool {
     }
 
     public class FibonacciTask implements Callable<Long> {
-        private final int index;
+        private int index;
         private final AtomicBoolean cancelled = new AtomicBoolean(false);
         private final Long taskId;
 
@@ -54,24 +56,30 @@ public class ThreadPool {
             this.index = index;
             this.taskId = taskId;
         }
+        public int getIndex() {
+            return index;
+        }
         public void cancelTask() {
             cancelled.set(true);
         }
         @Override
         public Long call(){
-            executingTasks.remove(taskId);
+            tasksInQueue.remove(taskId);
             if (Thread.currentThread().isInterrupted()) {
                 return null;
             }
-            System.out.println("call"+index);
-
-            return calculateFibonacci(index);
+//            System.out.println("call"+index);
+            timeStart.put(taskId, (long) (System.nanoTime()/1e9));
+            Long startTime = (long) (System.nanoTime()/1e9);
+            Long temp = calculateFibonacci(index);
+            Long endTime = (long) (System.nanoTime()/1e9);
+            System.out.println("Time for "+index+"="+(endTime-startTime));
+            return temp;
         }
 
 
         private long calculateFibonacci(int n) {
-            long temp = 0; // Оголосити temp перед циклом
-
+            long temp = 0;
             if (n <= 1) {
                 return n;
             } else {
@@ -84,13 +92,24 @@ public class ThreadPool {
                     }
                     temp = calculateFibonacci(i - 1) + calculateFibonacci(i - 2);
                 }
+                Long endTime = (long) (System.nanoTime()/1e9);
+
                 return temp;
             }
         }
 
 
     }
+
+    public Map<Long, Long> getTimeStart() {
+        return timeStart;
+    }
+
+    public int getIndexFromTask(Long taskId) {
+        return taskIndexMap.get(taskId);
+    }
+
     public boolean isInQueue(Long id){
-        return executingTasks.contains(id);
+        return tasksInQueue.contains(id);
     }
 }

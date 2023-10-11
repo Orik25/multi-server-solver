@@ -1,6 +1,7 @@
 package com.orik.applicationserver.config;
 
 
+import com.orik.applicationserver.constant.RoleData;
 import com.orik.applicationserver.filter.JWTTokenValidatorFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +13,16 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 public class SecurityConfig {
-
+    private static final String USER = RoleData.USER.getRoleName();
+    private static final String VIP = RoleData.VIP.getRoleName();
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/get-from-app").authenticated()
+                        .requestMatchers("/get-status/**","/get-result","/cancel-task/**").hasAnyRole(USER,VIP)
+                        .requestMatchers("/get-statistic").permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());
         return http.build();
