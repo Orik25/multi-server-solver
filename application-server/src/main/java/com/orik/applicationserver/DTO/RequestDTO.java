@@ -9,11 +9,8 @@ public class RequestDTO {
 
     private Integer request;
 
-    private Long result;
-
     private String status;
 
-    private Integer port;
 
     public RequestDTO() {
     }
