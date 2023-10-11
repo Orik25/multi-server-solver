@@ -1,10 +1,17 @@
 package com.orik.applicationserver.controller;
 
 import com.orik.applicationserver.DTO.RequestDTO;
+import com.orik.applicationserver.DTO.ServerStatusDTO;
 import com.orik.applicationserver.DTO.StatusRequestDTO;
 import com.orik.applicationserver.component.ThreadPool;
 import com.orik.applicationserver.constant.RequestStatus;
+import com.orik.applicationserver.constant.TimeForSolve;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,15 +23,12 @@ public class TestController {
 
     private final ThreadPool threadPool;
     private final Map<Long, Future<Long>> taskMap = new ConcurrentHashMap<>();
+    private RestTemplate restTemplate;
 
 
-    public TestController(ThreadPool threadPool) {
+    public TestController(ThreadPool threadPool,RestTemplate restTemplate) {
         this.threadPool = threadPool;
-    }
-
-    @GetMapping("/get-response/{body}")
-    public String getResponse(@PathVariable String body){
-        return "response from application-server("+body+")!";
+        this.restTemplate = restTemplate;
     }
 
     @PostMapping("/get-result")
@@ -32,9 +36,7 @@ public class TestController {
         int index = requestDTO.getRequest();
         Future<Long> task = threadPool.executeTask(index,requestDTO.getId());
         taskMap.put(requestDTO.getId(), task);
-        System.out.println("start");
         requestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus());
-
         return requestDTO;
     }
 
@@ -55,31 +57,34 @@ public class TestController {
                 statusRequestDTO.setStatus(RequestStatus.IN_QUEUE.getStatus());
             }
             else {
+                Long currentTime = (long) (System.nanoTime()/1e9);
                 statusRequestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus());
+                statusRequestDTO.setTimeLeft(TimeForSolve.timeMap.get(threadPool.getIndexFromTask(id))-(currentTime-threadPool.getTimeStart().get(statusRequestDTO.getId())));
             }
             return statusRequestDTO;
         }
         else if(future.isCancelled()){
             statusRequestDTO.setStatus(RequestStatus.CANCALED.getStatus());
+            statusRequestDTO.setTimeLeft(null);
             removeTask(id);
             return statusRequestDTO;
         }
         else{
             statusRequestDTO.setStatus(RequestStatus.DONE.getStatus());
             statusRequestDTO.setResult(future.get());
+            statusRequestDTO.setTimeLeft(null);
             removeTask(id);
+
             return statusRequestDTO;
         }
     }
 
-    @GetMapping("/get-active")
-    public int active() {
-        return threadPool.getActiveThreadCount();
-    }
-
-    @GetMapping("/get-size")
-    public int getSize() {
-        return threadPool.getQueueSize();
+    @GetMapping("/get-statistic")
+    public ServerStatusDTO getStatistic(){
+        ServerStatusDTO serverStatusDTO = new ServerStatusDTO();
+        serverStatusDTO.setActiveThreads(threadPool.getActiveThreadCount());
+        serverStatusDTO.setRequestInQueue(threadPool.getQueueSize());
+        return serverStatusDTO;
     }
 
     private void removeTask(Long id){

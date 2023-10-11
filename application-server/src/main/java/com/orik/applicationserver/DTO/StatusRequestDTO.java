@@ -4,6 +4,7 @@ public class StatusRequestDTO {
     private Long id;
     private Long result;
     private String status;
+    private Long timeLeft;
 
     public StatusRequestDTO() {
     }
@@ -30,5 +31,13 @@ public class StatusRequestDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getTimeLeft() {
+        return timeLeft;
+    }
+
+    public void setTimeLeft(Long timeLeft) {
+        this.timeLeft = timeLeft;
     }
 }
