@@ -6,10 +6,6 @@ import com.orik.applicationserver.DTO.StatusRequestDTO;
 import com.orik.applicationserver.component.ThreadPool;
 import com.orik.applicationserver.constant.RequestStatus;
 import com.orik.applicationserver.constant.TimeForSolve;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,15 +32,15 @@ public class TestController {
         int index = requestDTO.getRequest();
         Future<Long> task = threadPool.executeTask(index,requestDTO.getId());
         taskMap.put(requestDTO.getId(), task);
-        requestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus());
+        requestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus()+"("+TimeForSolve.timeMap.get(threadPool.getIndexFromTask(requestDTO.getId()))+"sek.)");
         return requestDTO;
     }
 
     @PostMapping("/cancel-task/{taskId}")
-    public String cancelTask(@PathVariable Long taskId) {
+    public StatusRequestDTO cancelTask(@PathVariable Long taskId) throws ExecutionException, InterruptedException {
         Future<Long> task = taskMap.get(taskId);
         boolean cancel = task.cancel(true);
-        return "canceled"+cancel;
+        return getTaskStatus(taskId);
     }
 
     @PostMapping("/get-status/{id}")
@@ -64,7 +60,7 @@ public class TestController {
             return statusRequestDTO;
         }
         else if(future.isCancelled()){
-            statusRequestDTO.setStatus(RequestStatus.CANCALED.getStatus());
+            statusRequestDTO.setStatus(RequestStatus.CANCELED.getStatus());
             statusRequestDTO.setTimeLeft(null);
             removeTask(id);
             return statusRequestDTO;

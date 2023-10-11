@@ -1,20 +1,23 @@
 package com.orik.clientserver.controller;
 
 import com.orik.clientserver.DTO.request.RequestConverterDTO;
+import com.orik.clientserver.DTO.request.RequestDTO;
+import com.orik.clientserver.DTO.request.StatusRequestDTO;
+import com.orik.clientserver.constant.JWTTokenGenerator;
 import com.orik.clientserver.entities.Request;
 import com.orik.clientserver.entities.User;
 import com.orik.clientserver.service.interfaces.RequestService;
 import com.orik.clientserver.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.http.HttpResponse;
 
 @Controller
 @RequestMapping("/api")
@@ -54,28 +57,49 @@ public class UserController {
 
     @PostMapping("/find-number")
     public String findFibonacciNumber(@RequestParam("request") int index) {
-        //визначаємо порт на який будемо кидати запит
-        Request request = requestService.addNew(requestConverterDTO.convertToEntity(index));
         int port = 8082;
-        request.setPort(port);
-        String serverUrl = "http://localhost:"+port+"get-result";
-
-        // Створюємо HttpHeaders з налаштуваннями для JSON-запиту
+        Request request = requestService.addNew(requestConverterDTO.convertToEntity(index,port));
+        String serverUrl = "http://localhost:"+port+"/get-result";
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
 
-        // Створюємо HttpEntity з об'єктом request і HttpHeaders
-        HttpEntity<Request> requestEntity = new HttpEntity<>(request, headers);
+        RequestDTO requestDTO = requestConverterDTO.convertToDTO(request);
 
-        // Відправляємо POST-запит з HttpEntity
-        restTemplate.postForObject(serverUrl, requestEntity, String.class);
-
+        HttpEntity<RequestDTO> requestEntity = new HttpEntity<>(requestDTO, headers);
+        ResponseEntity<RequestDTO> response = restTemplate.exchange(serverUrl, HttpMethod.POST, requestEntity, RequestDTO.class);
+        requestService.update(response.getBody());
         return "redirect:/api";
     }
 
     @GetMapping("/delete-request/{id}")
     public String delete(@PathVariable("id") Long id) {
         requestService.deleteById(id);
+        return "redirect:/api";
+    }
+
+    @GetMapping("/refresh-request/{id}")
+    public String refresh(@PathVariable("id") Long id) {
+        Request request = requestService.findById(id);
+        int port = request.getPort();
+        String serverUrl = "http://localhost:"+port+"/get-status/"+id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<StatusRequestDTO> response = restTemplate.exchange(serverUrl, HttpMethod.POST, requestEntity, StatusRequestDTO.class);
+        requestService.update(response.getBody());
+        return "redirect:/api";
+    }
+
+    @GetMapping("/cancel-request/{id}")
+    public String cancel(@PathVariable("id") Long id) {
+        Request request = requestService.findById(id);
+        int port = request.getPort();
+        String serverUrl = "http://localhost:"+port+"/cancel-task/"+id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<StatusRequestDTO> response = restTemplate.exchange(serverUrl, HttpMethod.POST, requestEntity, StatusRequestDTO.class);
+        requestService.update(response.getBody());
         return "redirect:/api";
     }
     private User getUserFromAuthentication(){
