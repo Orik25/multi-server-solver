@@ -23,12 +23,13 @@ public class RequestConverterDTO {
         this.userService = userService;
     }
 
-    public Request convertToEntity(int index){
+    public Request convertToEntity(int index,int port){
         Request request = new Request();
         request.setRequest(index);
         request.setStatus(RequestStatus.IN_PROGRESS.getStatus());
         request.setTime(ZonedDateTime.now());
         request.setUser(getUserFromAuthentication());
+        request.setPort(port);
         return request;
     }
 
