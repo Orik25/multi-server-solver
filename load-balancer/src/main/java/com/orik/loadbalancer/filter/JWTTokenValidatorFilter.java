@@ -1,6 +1,7 @@
-package com.orik.applicationserver.filter;
+package com.orik.loadbalancer.filter;
 
-import com.orik.applicationserver.constant.SecurityConstants;
+
+import com.orik.loadbalancer.constant.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class JWTTokenValidatorFilter  extends OncePerRequestFilter {
+public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -68,11 +69,6 @@ public class JWTTokenValidatorFilter  extends OncePerRequestFilter {
             return token.substring(7);
         }
         return null;
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().equals("/get-statistic");
     }
 
 }
