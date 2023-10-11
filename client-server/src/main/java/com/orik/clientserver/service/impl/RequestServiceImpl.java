@@ -44,6 +44,7 @@ public class RequestServiceImpl implements RequestService {
     public void deleteById(Long id) {
         Request request = requestRepository.findById(id)
                 .orElseThrow(()-> new NoRequestFoundException("Impossible to update the Request. Request not found with id: " + id));
+        requestRepository.delete(request);
     }
 
 }
