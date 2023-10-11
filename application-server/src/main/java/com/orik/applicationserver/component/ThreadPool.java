@@ -73,7 +73,6 @@ public class ThreadPool {
             Long startTime = (long) (System.nanoTime()/1e9);
             Long temp = calculateFibonacci(index);
             Long endTime = (long) (System.nanoTime()/1e9);
-            System.out.println("Time for "+index+"="+(endTime-startTime));
             return temp;
         }
 
