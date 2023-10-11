@@ -57,7 +57,7 @@ public class UserController {
 
     @PostMapping("/find-number")
     public String findFibonacciNumber(@RequestParam("request") int index) {
-        int port = 8082;
+        int port = getPort();
         Request request = requestService.addNew(requestConverterDTO.convertToEntity(index,port));
         String serverUrl = "http://localhost:"+port+"/get-result";
         HttpHeaders headers = new HttpHeaders();
@@ -102,8 +102,19 @@ public class UserController {
         requestService.update(response.getBody());
         return "redirect:/api";
     }
+
+    private Integer getPort(){
+        String serverUrl = "http://localhost:8081/get-port";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<Integer> response = restTemplate.exchange(serverUrl, HttpMethod.GET, requestEntity, Integer.class);
+        return response.getBody();
+    }
     private User getUserFromAuthentication(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.findByEmail(authentication.getName());
     }
+
+
 }
