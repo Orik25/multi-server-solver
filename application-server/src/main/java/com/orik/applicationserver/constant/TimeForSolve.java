@@ -33,7 +33,7 @@ public class TimeForSolve {
         timeMap.put(22, 3L);
         timeMap.put(23, 5L);
         timeMap.put(24, 8L);
-        timeMap.put(25, 23L);
+        timeMap.put(25, 29L);
         timeMap.put(26, 47L);
         timeMap.put(27, 115L);
         timeMap.put(28, 265L);

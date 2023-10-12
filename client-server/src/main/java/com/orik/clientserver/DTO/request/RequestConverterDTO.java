@@ -23,7 +23,7 @@ public class RequestConverterDTO {
         this.userService = userService;
     }
 
-    public Request convertToEntity(int index,int port){
+    public Request convertToEntity(int index,Integer port){
         Request request = new Request();
         request.setRequest(index);
         request.setStatus(RequestStatus.IN_PROGRESS.getStatus());

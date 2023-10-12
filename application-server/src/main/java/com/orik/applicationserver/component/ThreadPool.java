@@ -1,5 +1,6 @@
 package com.orik.applicationserver.component;
 
+import com.orik.applicationserver.constant.ThreadPoolConstants;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,11 +19,12 @@ public class ThreadPool {
     private Map<Long,Long> timeStart = new HashMap<>();
 
 
-    private final int NUMBER_OF_THREADS = 5;
+    private final int NUMBER_OF_THREADS = ThreadPoolConstants.NUMBER_OF_THREADS;
+    private final int CAPACITY_OF_QUEUE = ThreadPoolConstants.CAPACITY_OF_QUEUE;
 
     public ThreadPool() {
 
-        taskQueue = new LinkedBlockingQueue<>(10);
+        taskQueue = new LinkedBlockingQueue<>(CAPACITY_OF_QUEUE);
         executorService = new ThreadPoolExecutor(
                 NUMBER_OF_THREADS, NUMBER_OF_THREADS, 0L, TimeUnit.MILLISECONDS, taskQueue);
     }

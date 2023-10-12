@@ -41,7 +41,7 @@
                 <form th:action="@{/api/find-number}" method="post">
                   <div class="mb-3">
                     <label for="requestInput" class="form-label">Find the Fibonacci number</label>
-                    <input type="text" class="form-control" id="requestInput" name="request" placeholder="Enter index" th:value="${request}">
+                    <input type="number" class="form-control" id="requestInput" name="request" placeholder="Enter index" th:value="${request}" min="1" max="30">
                   </div>
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -120,7 +120,7 @@
                       <td>
                         <a th:href="@{/api/refresh-request/{id}(id=${request.id})}"
                            class="btn btn-warning"
-                           th:if="${request.status.contains('in progress')}">
+                           th:if="${request.status.contains('in progress') or request.status == 'in queue'}">
                           <i class="fas fa-sync-alt ml-2"></i>
                         </a>
                       </td>
@@ -132,7 +132,7 @@
                         </a>
                       </td>
                       <td><a th:href="@{/api/delete-request/{id}(id=${request.id})}"
-                             th:if="${request.status == 'done' or request.status == 'canceled'}"
+                             th:if="${request.status == 'done' or request.status.contains('canceled')}"
                              class="btn btn-warning"><i class="fas fa-user-times ml-2"
                                                         onclick="if(!(confirm('Are you sure?'))) return false"></i></a>
                       </td>
