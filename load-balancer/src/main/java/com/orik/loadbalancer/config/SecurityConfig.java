@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/get-port").hasAnyRole(USER,VIP)
+                        .requestMatchers("/get-port","/update").hasAnyRole(USER,VIP)
                         .requestMatchers("/get-statistic").hasRole(ADMIN)
                 )
                 .httpBasic(Customizer.withDefaults());
