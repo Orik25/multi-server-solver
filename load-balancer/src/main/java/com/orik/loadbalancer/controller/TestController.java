@@ -25,7 +25,7 @@ public class TestController {
     private Map<Integer, ServerStatusDTO> serversStatistic = new HashMap<>();
     private Integer port;
     private int currentTries;
-    private final int TRIES = 1;
+    private final int TRIES = 2;
 
     @Autowired
     public TestController(RestTemplate restTemplate) {
@@ -49,7 +49,6 @@ public class TestController {
     @GetMapping("/update")
     private String update(){
         this.currentTries=0;
-        getStatistic();
         return "Statistic updated";
     }
 
