@@ -1,8 +1,10 @@
 package com.orik.loadbalancer.controller;
 
+import com.orik.loadbalancer.DTO.PortDTO;
 import com.orik.loadbalancer.DTO.ServerStatusDTO;
 import com.orik.loadbalancer.constant.Active;
 import com.orik.loadbalancer.constant.RoleData;
+import com.orik.loadbalancer.constant.ThreadPoolConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +23,7 @@ public class TestController {
 
     private final RestTemplate restTemplate;
     private Map<Integer, ServerStatusDTO> serversStatistic = new HashMap<>();
-    private int port;
+    private Integer port;
     private int currentTries;
     private final int TRIES = 1;
 
@@ -32,17 +34,16 @@ public class TestController {
     }
 
     @GetMapping("/get-port")
-    public Integer getStatistic() {
+    public PortDTO getStatistic() {
         if(checkVip()){
-            return Active.servers[Active.servers.length-1];
+            return new PortDTO(Active.servers[Active.servers.length-1]);
         }
         if (currentTries == 0) {
             updateStatistic();
         }
         this.currentTries = (this.currentTries + 1) % TRIES;
 
-        getMinPort();
-        return this.port;
+        return new PortDTO(getMinPort());
     }
 
     @GetMapping("/update")
@@ -68,17 +69,21 @@ public class TestController {
         return authorities.get(0).toString().equals(RoleData.VIP.getDBRoleName());
     }
 
-    private void getMinPort() {
+    private Integer getMinPort() {
         Optional<Map.Entry<Integer, ServerStatusDTO>> result = serversStatistic.entrySet().stream()
                 .min(Comparator.comparingInt((Map.Entry<Integer, ServerStatusDTO> entry) -> entry.getValue().getActiveThreads())
                         .thenComparingInt(entry -> entry.getValue().getRequestInQueue()));
 
         if (result.isPresent()) {
-            this.port = result.get().getKey();
+            boolean equal = result.get().getValue().getActiveThreads()== ThreadPoolConstants.NUMBER_OF_THREADS && result.get().getValue().getRequestInQueue()==ThreadPoolConstants.CAPACITY_OF_QUEUE;
+            if (equal) {
+                return  null;
+            } else {
+                return result.get().getKey();
+            }
         } else {
-            this.port = Active.servers[0];
+            return null;
         }
-
     }
 
 }

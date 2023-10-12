@@ -32,7 +32,6 @@ public class TestController {
         int index = requestDTO.getRequest();
         Future<Long> task = threadPool.executeTask(index,requestDTO.getId());
         taskMap.put(requestDTO.getId(), task);
-        requestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus()+"("+TimeForSolve.timeMap.get(threadPool.getIndexFromTask(requestDTO.getId()))+"sek.)");
         return requestDTO;
     }
 

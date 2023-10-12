@@ -1,9 +1,11 @@
 package com.orik.clientserver.controller;
 
+import com.orik.clientserver.DTO.request.PortDTO;
 import com.orik.clientserver.DTO.request.RequestConverterDTO;
 import com.orik.clientserver.DTO.request.RequestDTO;
 import com.orik.clientserver.DTO.request.StatusRequestDTO;
 import com.orik.clientserver.constant.JWTTokenGenerator;
+import com.orik.clientserver.constant.RequestStatus;
 import com.orik.clientserver.entities.Request;
 import com.orik.clientserver.entities.User;
 import com.orik.clientserver.service.interfaces.RequestService;
@@ -57,17 +59,23 @@ public class UserController {
 
     @PostMapping("/find-number")
     public String findFibonacciNumber(@RequestParam("request") int index) {
-        int port = getPort();
+        Integer port = getPort();
+        System.out.println(port);
         Request request = requestService.addNew(requestConverterDTO.convertToEntity(index,port));
-        String serverUrl = "http://localhost:"+port+"/get-result";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
-
         RequestDTO requestDTO = requestConverterDTO.convertToDTO(request);
+        if(port!=null){
+            String serverUrl = "http://localhost:"+port+"/get-result";
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
+            HttpEntity<RequestDTO> requestEntity = new HttpEntity<>(requestDTO, headers);
+            ResponseEntity<RequestDTO> response = restTemplate.exchange(serverUrl, HttpMethod.POST, requestEntity, RequestDTO.class);
+            requestService.update(response.getBody());
+        }
+        else {
+            requestDTO.setStatus(RequestStatus.CANCELED.getStatus()+" because all servers are busy");
+            requestService.update(requestDTO);
+        }
 
-        HttpEntity<RequestDTO> requestEntity = new HttpEntity<>(requestDTO, headers);
-        ResponseEntity<RequestDTO> response = restTemplate.exchange(serverUrl, HttpMethod.POST, requestEntity, RequestDTO.class);
-        requestService.update(response.getBody());
         return "redirect:/api";
     }
 
@@ -108,8 +116,8 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer "+ JWTTokenGenerator.generateToken(SecurityContextHolder.getContext().getAuthentication()));
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<Integer> response = restTemplate.exchange(serverUrl, HttpMethod.GET, requestEntity, Integer.class);
-        return response.getBody();
+        ResponseEntity<PortDTO> response = restTemplate.exchange(serverUrl, HttpMethod.GET, requestEntity, PortDTO.class);
+        return response.getBody().getPort();
     }
     private User getUserFromAuthentication(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
