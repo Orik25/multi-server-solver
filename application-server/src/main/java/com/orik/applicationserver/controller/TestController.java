@@ -38,8 +38,15 @@ public class TestController {
     public RequestDTO calculateFibonacci(@RequestBody RequestDTO requestDTO) throws ExecutionException, InterruptedException {
         int index = requestDTO.getRequest();
         checkForUpdate();
+        if(checkInQueue()){
+            requestDTO.setStatus(RequestStatus.IN_QUEUE.getStatus());
+        }
+        else{
+            requestDTO.setStatus(RequestStatus.IN_PROGRESS.getStatus()+"("+TimeForSolve.timeMap.get(index)+"sek.)");
+        }
         Future<Long> task = threadPool.executeTask(index,requestDTO.getId());
         taskMap.put(requestDTO.getId(), task);
+
         return requestDTO;
     }
 
@@ -47,6 +54,10 @@ public class TestController {
         if(threadPool.getActiveThreadCount() == ThreadPoolConstants.NUMBER_OF_THREADS-1 || threadPool.getQueueSize()==ThreadPoolConstants.CAPACITY_OF_QUEUE-1){
            update();
         }
+    }
+
+    private boolean checkInQueue(){
+        return threadPool.getActiveThreadCount() == ThreadPoolConstants.NUMBER_OF_THREADS;
     }
 
     private void update(){
