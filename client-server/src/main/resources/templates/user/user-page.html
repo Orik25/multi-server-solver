@@ -41,7 +41,7 @@
                 <form th:action="@{/api/find-number}" method="post">
                   <div class="mb-3">
                     <label for="requestInput" class="form-label">Find the Fibonacci number</label>
-                    <input type="text" class="form-control" id="requestInput" name="request" placeholder="Enter index" th:value="${request}">
+                    <input type="number" class="form-control" id="requestInput" name="request" placeholder="Enter index" th:value="${request}" min="1" max="30">
                   </div>
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
